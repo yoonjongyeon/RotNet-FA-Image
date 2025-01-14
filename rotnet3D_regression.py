@@ -167,6 +167,81 @@ class RotationRegressionModel(nn.Module):
         return self.fc4(x)
 
 
+def visualize_sample(model, dataset, device, epoch, sample_idx=0):
+    """
+    Visualize the prediction of a single sample from the dataset.
+
+    Args:
+        model (torch.nn.Module): The trained PyTorch model for rotation angle prediction.
+        dataset (Dataset): The dataset containing the input images and true angles.
+        device (torch.device): The device (CPU or GPU) on which the model is running.
+        epoch (int): The current epoch number, used for saving visualizations.
+        sample_idx (int, optional): The index of the sample to visualize. Defaults to 0.
+
+    Returns:
+        None. Saves a visualization of the original and rotated image with predicted and true rotation angles.
+    """
+    # Set the model to evaluation mode and disable gradient computation
+    model.eval()
+    with torch.no_grad():
+        # Retrieve the input image and true angle for the specified sample
+        input_image, true_angle = dataset[sample_idx]
+
+        # Check if the input image contains invalid values
+        if torch.isnan(input_image).any():
+            print(f"Skipping visualization for sample {sample_idx} - invalid data")
+            return
+        
+        # Prepare the input tensor for the model by adding a batch dimension and moving to the device
+        input_tensor = input_image.unsqueeze(0).to(device)
+
+        # Predict the rotation angle using the model
+        predicted_angle = model(input_tensor)
+
+        # Extract the middle slices from the 3D image for visualization
+        mid_slice_xy = input_image[0, input_image.shape[1] // 2, :, :]
+        mid_slice_yz = input_image[0, :, input_image.shape[2] // 2, :]
+        mid_slice_xz = input_image[0, :, :, input_image.shape[3] // 2]
+
+        # Create a figure for displaying the original and rotated images
+        fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+
+        # Plot the original image slices
+        axes[0, 0].imshow(mid_slice_xy, cmap='gray')
+        axes[0, 0].set_title('Original - XY Plane')
+        axes[0, 1].imshow(mid_slice_yz, cmap='gray')
+        axes[0, 1].set_title('Original - YZ Plane')
+        axes[0, 2].imshow(mid_slice_xz, cmap='gray')
+        axes[0, 2].set_title('Original - XZ Plane')
+
+        # Apply the true rotation to the original image for comparison
+        rotated_image = dataset.rotate_image(input_image[0].numpy(), true_angle.item())
+
+        # Extract the middle slices from the rotated image
+        mid_rotated_xy = rotated_image[rotated_image.shape[0] // 2, :, :]
+        mid_rotated_yz = rotated_image[:, rotated_image.shape[1] // 2, :]
+        mid_rotated_xz = rotated_image[:, :, rotated_image.shape[2] // 2]
+
+        # Plot the rotated image slices
+        axes[1, 0].imshow(mid_rotated_xy, cmap='gray')
+        axes[1, 0].set_title('Rotated - XY Plane')
+        axes[1, 1].imshow(mid_rotated_yz, cmap='gray')
+        axes[1, 1].set_title('Rotated - YZ Plane')
+        axes[1, 2].imshow(mid_rotated_xz, cmap='gray')
+        axes[1, 2].set_title('Rotated - XZ Plane')
+
+        # Add a title summarizing the true and predicted angles
+        plt.suptitle(f'Epoch {epoch + 1}\n'
+                     f'True X-axis rotation: {true_angle.item():.1f}°\n'
+                     f'Predicted X-axis rotation: {predicted_angle.item():.1f}°')
+
+        # Adjust the layout and save the figure
+        plt.tight_layout()
+        os.makedirs(f'result_regression/epoch_{epoch + 1}', exist_ok=True)
+        plt.savefig(f'result_regression/epoch_{epoch + 1}/sample_prediction_{sample_idx}.png')
+        plt.close()
+
+
 def train_model(data_dir, batch_size=8, epochs=20, lr=1e-3):
     """
     Train the rotation regression model on the given dataset.
@@ -214,6 +289,9 @@ def train_model(data_dir, batch_size=8, epochs=20, lr=1e-3):
         scheduler.step(epoch_loss)
 
         print(f"Epoch {epoch + 1}/{epochs}, Loss: {epoch_loss:.4f}")
+        if epoch == 0 or (epoch+1) % 5 == 0:
+            for sample_idx in range(min(10, len(dataset))):
+                visualize_sample(model, dataset, device, epoch, sample_idx)
 
     return model, train_losses
 
