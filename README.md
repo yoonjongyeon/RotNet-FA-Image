@@ -27,7 +27,7 @@ pip3 install -r requirements.txt
 - `Training Script`: Handles the training process, model evaluation, and visualization.
 
 ## Running the Model
-- Prepare your dataset of .nii.gz files and place them in the data directory. (default: "./data")
+- Prepare your dataset of .nii.gz files and place them in the data directory. (default: `./data`)
 - Train the model using the provided training script:
 ```python
 python3 rotnet3D_regression.py
@@ -37,14 +37,11 @@ python3 rotnet3D_regression.py
 ## Outputs
 - Useful Feature: Saved as `vectors.npy`, containing the last layer of fully connected layer's weights
 - Training History: Plots of the mean squared error (MSE) loss over epochs.
-<img src="result_regression/training_history.png" alt="sample" width="500" height="300">
+<img src="result_regression/training_history.png" alt="sample" width="500" height="400">
 
 - Visualizations: Image without rotation and image with ground truth rotation / Ground truth rotation and the predicted rotation for epoch 1, 25, 50, 75, 100
-<img src="result_regression/epoch_1/sample_prediction_0.png" alt="Epoch 1" width="500" height="300">
-<img src="result_regression/epoch_25/sample_prediction_0.png" alt="Epoch 25" width="500" height="300">
-<img src="result_regression/epoch_50/sample_prediction_0.png" alt="Epoch 50" width="500" height="300">
-<img src="result_regression/epoch_75/sample_prediction_0.png" alt="Epoch 75" width="500" height="300">
-<img src="result_regression/epoch_100/sample_prediction_0.png" alt="Epoch 100" width="500" height="300">
-
-## License
-This project is licensed under the MIT License.
+<img src="result_regression/epoch_1/sample_prediction_0.png" alt="Epoch 1" width="900" height="600">
+<img src="result_regression/epoch_25/sample_prediction_0.png" alt="Epoch 25" width="900" height="600">
+<img src="result_regression/epoch_50/sample_prediction_0.png" alt="Epoch 50" width="900" height="600">
+<img src="result_regression/epoch_75/sample_prediction_0.png" alt="Epoch 75" width="900" height="600">
+<img src="result_regression/epoch_100/sample_prediction_0.png" alt="Epoch 100" width="900" height="600">
