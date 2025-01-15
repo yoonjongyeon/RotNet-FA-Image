@@ -1,7 +1,9 @@
 # RotNet-FA-Image
 
 ## Overview
-RotNet-FA-Image is a Python-based deep learning project for predicting rotation angles of fractional anisotropy (FA) maps derived from NIfTI (.nii.gz) files. It leverages 3D convolutional neural networks (CNNs) implemented in PyTorch to regress rotation angles.
+RotNet-FA-Image is a Python-based deep learning project for predicting rotation angles of fractional anisotropy (FA) maps derived from NIfTI (.nii.gz) files. It leverages 3D convolutional neural networks (CNNs) implemented in PyTorch to regress rotation angles. The augmented data helps us extract meaningful features from the input data.
+
+Original RotNet repo: https://github.com/d4nst/RotNet
 
 ## Environment
 - Ubuntu version: 22.04.4 LTS 
